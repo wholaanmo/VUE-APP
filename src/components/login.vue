@@ -185,7 +185,7 @@
         
         // Refresh the user's groups list
         try {
-          const groupsResponse = await axios.get('${import.meta.env.VITE_API_URL}/api/grp_expenses/my-groups', {
+          const groupsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/grp_expenses/my-groups`, {
             headers: {
               Authorization: `Bearer ${response.data.token}`
             }
@@ -293,7 +293,7 @@
         try {
             console.log('Sending OTP request for:', resetEmail.value);
           const response = await axios.post(
-            '${import.meta.env.VITE_API_URL}/api/users/forgot-password',
+            `${import.meta.env.VITE_API_URL}/api/users/forgot-password`,
             { email: resetEmail.value }
           );
   
@@ -335,7 +335,7 @@ if (!/^\d{6}$/.test(otpString)) {
         try {
           console.log('Verifying OTP for:', resetEmail.value);
           const response = await axios.post(
-            '${import.meta.env.VITE_API_URL}/api/users/verify-otp',
+            `${import.meta.env.VITE_API_URL}/api/users/verify-otp`,
             { 
               email: resetEmail.value,
               otp: otpString
@@ -398,7 +398,7 @@ if (!/^\d{6}$/.test(otpString)) {
         });
 
           const response = await axios.post(
-            '${import.meta.env.VITE_API_URL}/api/users/reset-password-otp',
+            `${import.meta.env.VITE_API_URL}/api/users/reset-password-otp`,
             { 
               email: resetEmail.value,
               newPassword: newPassword.value,
@@ -438,7 +438,7 @@ if (!/^\d{6}$/.test(otpString)) {
   
         try {
           const response = await axios.post(
-            '${import.meta.env.VITE_API_URL}/api/users/login',
+            `${import.meta.env.VITE_API_URL}/api/users/login`,
             {
               email: email.value,
               password: password.value,

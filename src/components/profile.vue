@@ -580,7 +580,7 @@ updateExpenseView() {
         console.log('Token being sent:', token);
 
         const response = await this.$axios.delete(
-    '/api/users',
+          `${import.meta.env.VITE_API_URL}/api/users`,
     {
         headers: { 
             Authorization: `Bearer ${token}` 
@@ -637,7 +637,7 @@ updateExpenseView() {
       try {
         const token = localStorage.getItem('jsontoken');
         const groupListResponse = await this.$axios.get(
-          '/api/grp_expenses/my-groups',
+          `${import.meta.env.VITE_API_URL}/api/grp_expenses/my-groups`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -732,7 +732,7 @@ updateExpenseView() {
     performLogout() {
     const token = localStorage.getItem('jsontoken');
     
-    this.$axios.post('/api/users/logout', {}, {
+    this.$axios.post(`${import.meta.env.VITE_API_URL}/api/users/logout`, {}, {
         headers: { Authorization: `Bearer ${token}` }
     })
     .then(() => {

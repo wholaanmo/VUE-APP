@@ -211,13 +211,13 @@ export default {
 
         const inviteToken = route.query.inviteToken
     if (inviteToken) {
-      redirectAfterLogin.value = `/api/grp_expenses/accept-invite?token=${inviteToken}`
+      redirectAfterLogin.value = `${import.meta.env.VITE_API_URL}/api/grp_expenses/accept-invite?token=${inviteToken}`
     }
 
     const acceptInvitation = async (token) => {
       try {
         const response = await axios.get(
-          `/api/grp_expenses/accept-invite?token=${token}`,
+          `${import.meta.env.VITE_API_URL}/api/grp_expenses/accept-invite?token=${token}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('jsontoken')}`
@@ -338,7 +338,7 @@ export default {
   }
     
   try {
-    const res = await axios.post('/api/users', {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/users`, {
       username: username.value,
       email: email.value,
       password: password.value,
