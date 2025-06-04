@@ -1,6 +1,27 @@
 <template>
   <div class="bg">
-  <div class="container">
+
+     <!-- Navbar -->
+     <nav class="navbar">
+      <div class="navbar-container">
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="#" @click.prevent="scrollTo('container')" class="nav-link">Home</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" @click.prevent="scrollTo('personal')" class="nav-link">Personal Expense</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" @click.prevent="scrollTo('group')" class="nav-link">Group Expense</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" @click.prevent="scrollTo('register-container')" class="nav-link">Login</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+  <div class="container" ref="container">
     <div class="hero-graphic">
       <img src="/LOGO.png" alt="Money Log Logo" class="logo" />
       <div class="graphic-accent"></div>
@@ -18,56 +39,121 @@
       </div>
   </div>
 
-  <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-clipboard-list icon clipboard-icon"></i></div>
-          <h3>Personal Expense Management</h3>
-          <p>Log daily spending to monitor your expenses monthly and yearly</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon1">👥</div>
-          <h3>Group Expense Management</h3>
-          <p>Split costs and track shared expenses with housemates or friends</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon2"><i class="fas fa-chart-pie icon chart-icon"></i></div>
-          <h3>Data Visualization</h3>
-          <p>Visualize your spending trends with interactive tables and pie charts. </p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon3"><i class="fas fa-tags icon tags-icon"></i></div>
-          <h3>Expense Categorization</h3>
-          <p>Categorize each transaction (e.g., food, bills, transportation) to help you better organize and analyze your spending. </p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon4"><i class="fas fa-calendar-alt  icon calendar-icon"></i></div>
-          <h3>Filter Expenses by Date</h3>
-          <p>Sort and filter expenses by month and year to easily track your financial progress over time. </p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon5"><i class="fas fa-chart-line icon line-icon"></i></div>
-          <h3>Budget Tracking</h3>
-          <p>Add your personal budget and track how much you’ve spent and how much is left as you add expenses.</p>
-        </div>
+  <div class="personal" ref="personal">
+  <div class="personal-container">
+    <!-- Left side (60%) with feature cards -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+        <h3>Smart Budgeting</h3>
+        <p>Add and edit your personal budget. Get notified instantly when your spending goes over the limit.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon1"><i class="fas fa-clipboard-list icon clipboard-icon"></i></div>
+        <h3>Expense Management</h3>
+        <p>Easily manage your expenses by adding, editing, or deleting entries.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon2"><i class="fas fa-microphone"></i></div>
+        <h3>Voice Recognition</h3>
+        <p>Use voice recognition to quickly add new expenses without typing.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon3"><i class="fas fa-camera"></i></div>
+        <h3>Capture Every Transaction</h3>
+        <p>Upload photos of your receipts to keep a visual record of each transaction.</p>
       </div>
 
-    <div class="register-container">
-        <div class="register-card">
-          <h3>Ready to take control of your finances?</h3>
-          <p>Join thousands of users who are managing their money smarter</p>
-          <router-link to="/register" class="register-button">
-            Get Started - It's Free
-          </router-link>
-          <div class="login-prompt">
-            Already have an account? <router-link to="/login">Log in</router-link>
-          </div>
-          </div>
-          </div>
+    <div class="feature-card">
+        <div class="feature-icon4"><i class="fas fa-bell"></i></div>
+        <h3> Smart Notification</h3>
+        <p>Stay alert with notifications when your expenses exceed your budget.</p>
+      </div>
+
+    <div class="feature-card">
+        <div class="feature-icon5"><i class="fas fa-calendar-alt icon calendar-icon"></i></div>
+        <h3>Filtered Expense History</h3>
+        <p>View your expenses by month, year, or category and download your filtered expense data.</p>
+      </div>
+    </div>
+    
+    <!-- Right side (40%) with image and header -->
+    <div class="personal-image-section">
+      <h3 class="section-header">Personal Expense Tracker Features </h3>
+      <img src="/personal.png" alt="Personal Expense Tracker" class="personal-image" />
+    </div>
+  </div>
+</div>
+
+<div class="group" ref="group">
+  <div class="group-container">
+    <!-- Left side (40%) with image and header -->
+    <div class="group-image-section">
+      <h3 class="section-header">Group Expense Tracker Features</h3>
+      <img src="/group.png" alt="Group Expense Tracker" class="group-image" />
+    </div>
+    
+    <!-- Right side (60%) with feature cards -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon5"><i class="fas fa-users"></i></div>
+        <h3>Create or Join Groups</h3>
+        <p>Start your own group or join an existing one using a group code or an invitation sent via email.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon4"><i class="fas fa-user-shield"></i></div>
+        <h3>Admin Controls</h3>
+        <p>Admins can rename the group, manage members by removing or blocking them, update the group budget, or even delete the group.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon3"><i class="fas fa-clipboard-list icon clipboard-icon"></i></div>
+        <h3>Shared Expense Management</h3>
+        <p>All members can add, edit, or delete group expenses. Expenses can also be recorded using voice recognition.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon2"><i class="fas fa-file-image"></i></div>
+        <h3>Capture Every Transaction</h3>
+        <p>Upload, edit, or delete receipt photos for group expenses. </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon1"><i class="fas fa-hand-holding-usd"></i></div>
+        <h3>Expense Splitting & Contributions</h3>
+        <p>Split expenses fairly and track each member’s payments, showing who’s paid, pending, or owes balance.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-file-download"></i></div>
+        <h3>Reports & Notifications</h3>
+        <p>Download budget summaries, category breakdowns, member contributions, and full expense details anytime.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="split-container" ref="register-container">
+  <div class="register-container">
+    <div class="register-card">
+      <h3>Ready to take control of your finances?</h3>
+      <p>Join thousands of users who are managing their money smarter</p>
+      <router-link to="/register" class="register-button">
+        Get Started - It's Free
+      </router-link>
+      <div class="login-prompt">
+        Already have an account? <router-link to="/login">Log in</router-link>
+      </div>
+    </div>
+  </div>
+  <div class="image-container">
+    <img src="/register.png" alt="Financial management illustration">
+  </div>
+</div>
 
           <div v-if="accountDeleted" class="deletion-popup">
   <h3><i class="fas fa-check-circle"></i> Account Successfully Deleted</h3>
@@ -94,6 +180,22 @@ export default {
       accountDeleted: false
     };
   },
+
+  methods: {
+    scrollTo(refName) {
+    const element = this.$refs[refName];
+    if (element) {
+      // Add offset for navbar height
+      const offset = 70; // Match your navbar height
+      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({
+        top: elementPosition - offset,
+        behavior: 'smooth'
+      });
+    }
+  }
+},
+
   mounted() {
     
     if (this.$route.query.deleted) {
@@ -139,26 +241,95 @@ body {
 }
 </style>
 
-<style>
-body {
-  font-family: 'Poppins', sans-serif;
+<style scoped>
+.navbar {
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the navbar content */
+  left: 0;
+  right: 0;
+  transition: all 0.3s ease;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: center; /* Center the nav items */
+  align-items: center;
+  padding: 1rem 2rem;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
   margin: 0;
   padding: 0;
+  justify-content: center; /* Center the menu items */
   width: 100%;
-  background-color: #f8f9fa;
-  overflow-x: hidden;
-  overflow-y: auto;
 }
-</style>
 
-<style scoped>
+.nav-item {
+  position: relative;
+}
+
+.nav-link {
+  color: #2d3748;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.2px;
+  padding: 0.5rem 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(to right, #4CB5AB, #88C9BF);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: 	#4CB5AB;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-link.active {
+  color: 	#4CB5AB;
+  font-weight: 600;
+}
+
+.nav-link.active::after {
+  width: 100%;
+}
+
+
 .deletion-popup {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #ffffff;
-  border: 1px solid #355f52;
+  background: linear-gradient(135deg, #cde5dc, #a6cfc1, #88b8a5);
+  border: 1px solid #a5d6a7;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   padding: 15px 30px 35px 30px;
   width: 90%;
@@ -177,11 +348,11 @@ body {
   justify-content: center;
   gap: 10px;
   align-items: center;
-  color: #355f52;
+  color: #ffffff;
 }
 
 .deletion-popup p {
-  color: #355f52;
+  color: #f0f7f5;
   font-size: 1rem;
   margin-bottom: 25px;
 }
@@ -216,12 +387,35 @@ body {
   }
 }
 
-.register-container {
-  max-width: 600px;
-  margin: 30px auto 60px;
-  padding: 0 20px;
+.split-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
 }
 
+.register-container {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  margin-bottom: 80px;
+}
+
+.image-container {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px; 
+}
 .register-card {
   background: rgba(255, 255, 255, 0.75);
   border-radius: 24px;
@@ -274,7 +468,7 @@ body {
 
 .register-button {
   display: inline-block;
-  background: linear-gradient(135deg, #2e7d32, #a5d6a7); /* Rich green to soft green */
+  background: linear-gradient(135deg, #4CB5AB, #2a4b3c);
   color: white;
   padding: 14px 40px;
   border-radius: 12px;
@@ -319,35 +513,15 @@ body {
   margin-top: 20px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 900px) {
-  .features-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
 
-@media (max-width: 600px) {
-  .features-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .feature-card {
-    min-height: auto;
-    padding: 18px;
-  }
-  
-  .register-card {
-    padding: 25px 20px;
-  }
-}
 .bg {
-  background: linear-gradient(135deg, #e0f7fa, #fce4ec); /* soft teal to soft pink */
+  background: linear-gradient(135deg, #e0f7fa, #fce4ec);
   background-repeat: no-repeat;
   background-size: cover;
   position: relative;
   overflow-x: hidden;
   overflow-y: hidden;
+  min-height: 200vh;
 }
 
 .bg::before,
@@ -376,30 +550,153 @@ body {
 }
 
 .container,
-.features-grid,
+.personal, 
+.group,
+.image-container,
 .register-container {
   position: relative;
   z-index: 1; /* Makes sure content stays above background shapes */
 }
+
+.group {
+  margin: 40px auto; /* Reduced side margins to 0 */
+  max-width: 1200px; /* Slightly increased max-width */
+  padding: 0 15px; /* Reduced side padding */
+  width: 100%;
+}
+
+.group-container {
+  display: flex;
+  gap: 30px;
+  width: 90%;
+  margin: 0 auto;  /* centers the container horizontally */
+  justify-content: center; /* centers flex items inside the container */
+}
+
+.group-image {
+  width: 95%;
+  height: auto;
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  box-shadow:
+    0 8px 16px rgba(42, 75, 60, 0.2),
+    0 4px 8px rgba(106, 156, 137, 0.12),
+    0 0 12px rgba(139, 188, 174, 0.25); /* glow highlight */
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.group-image:hover {
+  transform: scale(1.03) translateY(-4px);
+  box-shadow:
+    0 12px 24px rgba(42, 75, 60, 0.25),
+    0 6px 12px rgba(106, 156, 137, 0.18),
+    0 0 20px rgba(139, 188, 174, 0.35);
+}
+
+
+.personal {
+  margin: 40px auto; /* Reduced side margins to 0 */
+  max-width: 1200px; /* Slightly increased max-width */
+  padding: 0 15px; /* Reduced side padding */
+  width: 100%;
+}
+
+.group-image-section {
+  flex: 0 0 38%; /* Slightly reduced from 40% */
+  padding: 0 10px; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.personal-container {
+  display: flex;
+  gap: 30px;
+  width: 90%;
+  margin: 0 auto;  /* centers the container horizontally */
+  justify-content: center; /* centers flex items inside the container */
+}
+
 .features-grid {
+  flex: 0 0 62%; /* Slightly increased from 60% */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px; /* Tighter gap */
-  margin: 40px auto;
-  max-width: 1000px; /* More compact container */
-  padding: 0 20px;
+  gap: 15px; /* Reduced gap between cards */
+  padding: 0 10px; /* Added internal padding */
 }
+
+
+.personal-image-section {
+  flex: 0 0 38%; /* Slightly reduced from 40% */
+  padding: 0 10px; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section-header {
+  font-size: 2.2rem;
+  color: #2a4b3c;
+  margin-bottom: 28px;
+  text-align: center;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 1.2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.08);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+
+/* Optional hover effect for subtle interaction */
+.section-header:hover {
+  color: #3d6651;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.section-header:hover::after {
+  background: #6a9c89;
+}
+
+
+.personal-image {
+  width: 95%;
+  height: auto;
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  box-shadow:
+    0 8px 16px rgba(42, 75, 60, 0.2),
+    0 4px 8px rgba(106, 156, 137, 0.12),
+    0 0 12px rgba(139, 188, 174, 0.25); /* glow highlight */
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.personal-image:hover {
+  transform: scale(1.03) translateY(-4px);
+  box-shadow:
+    0 12px 24px rgba(42, 75, 60, 0.25),
+    0 6px 12px rgba(106, 156, 137, 0.18),
+    0 0 20px rgba(139, 188, 174, 0.35);
+}
+
 
 .feature-card {
   background: white;
   border-radius: 16px;
-  padding: 25px; /* Reduced padding */
+  padding: 20px; /* Reduced padding */
   transition: all 0.3s ease;
   border-bottom: 6px solid #85A98F;
   box-shadow: 0 4px 12px rgba(50, 120, 70, 0.08);
-  min-height: 220px; /* Smaller fixed height */
+  max-height: 200px; /* Smaller fixed height */
   display: flex;
   flex-direction: column;
+  margin-top: 20px;
 }
 
 .feature-card:hover {
@@ -409,7 +706,7 @@ body {
 
 .feature-icon {
   font-size: 2rem; /* Smaller icon */
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   background: linear-gradient(135deg, #e8f5e9, #a5d6a7);
   width: 60px; /* Smaller circle */
   height: 60px;
@@ -429,7 +726,7 @@ body {
 
 .feature-icon1 {
   font-size: 2rem; /* Smaller icon */
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   background: linear-gradient(135deg, #a8edea, #fed6e3); /* mint to soft pink */
   width: 60px; /* Smaller circle */
   height: 60px;
@@ -448,7 +745,7 @@ body {
 
 .feature-icon2 {
   font-size: 2rem; /* Smaller icon */
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   background: linear-gradient(135deg, #ffe29f, #ffa99f); /* pastel yellow to peach */
   width: 60px; /* Smaller circle */
   height: 60px;
@@ -466,7 +763,7 @@ body {
 }
 .feature-icon3 {
   font-size: 2rem; /* Smaller icon */
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   background: linear-gradient(135deg, #d4fc79, #96e6a1); /* light green to mint */
   width: 60px; /* Smaller circle */
   height: 60px;
@@ -485,7 +782,7 @@ body {
 
 .feature-icon4 {
   font-size: 2rem; /* Smaller icon */
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   background: linear-gradient(135deg, #fff1a6, #fcd374); /* mint to soft blue */
   width: 60px; /* Smaller circle */
   height: 60px;
@@ -503,7 +800,7 @@ body {
 }
 .feature-icon5 {
   font-size: 2rem; /* Smaller icon */
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   background: linear-gradient(135deg, #dec8f3, #7b60bb);
   width: 60px; /* Smaller circle */
   height: 60px;
@@ -519,17 +816,16 @@ body {
   transform: scale(1.1);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
-
 .feature-card h3 {
-  font-size: 1.2rem; /* Smaller heading */
+  font-size: 1rem; /* Smaller heading */
   color: #2a4b3c;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   font-weight: 600;
   text-align: center;
 }
 
 .feature-card p {
-  font-size: 0.95rem; /* Smaller text */
+  font-size: 0.8rem; /* Smaller text */
   color: #5a6e65;
   line-height: 1.5;
   margin: 0;
@@ -538,17 +834,64 @@ body {
 
 /* Responsive adjustments */
 @media (max-width: 900px) {
+  .group-container {
+    flex-direction: column;
+  }
+
+  
+  .group-image-section,
   .features-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller desktop */
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  
+  .group-image-section {
+    order: 1;
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 900px) {
+  .personal-container {
+    flex-direction: column;
+  }
+  
+  .features-grid,
+  .personal-image-section {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  
+  .features-grid {
+    order: 2; /* Moves features below image on mobile */
+  }
+  
+  .personal-image-section {
+    order: 1; /* Moves image above features on mobile */
+    margin-bottom: 30px;
   }
 }
 
 @media (max-width: 600px) {
   .features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-header {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .personal {
     grid-template-columns: 1fr; /* 1 column on mobile */
     gap: 15px;
   }
   
+  .group {
+    grid-template-columns: 1fr; /* 1 column on mobile */
+    gap: 15px;
+  }
   .feature-card {
     min-height: auto;
     padding: 20px;
@@ -565,6 +908,7 @@ body {
   min-height: 100vh;
   max-width: 1400px;
   margin: 0 auto;
+  margin-top: 10px;
   position: relative;
   box-shadow: 0 10px 40px rgba(60, 120, 80, 0.15);
 }
