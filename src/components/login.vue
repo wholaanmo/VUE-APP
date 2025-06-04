@@ -145,21 +145,14 @@
       const confirmPassword = ref('');
       const resetToken = ref('');
 
-      const testConnection = async () => {
-  try {
-    const response = await axios.get('/api/healthcheck');
-    console.log('Connection test successful:', response.data);
-  } catch (error) {
-    console.error('Connection test failed:', error);
-  }
-};
-
       const handleLoginSuccess = async (response) => {
   localStorage.setItem('jsontoken', response.data.token);
   localStorage.setItem('user', JSON.stringify({
     id: response.data.user.id,
     username: response.data.user.username, 
     email: response.data.user.email,
+    first_name: response.data.user.first_name, 
+  last_name: response.data.user.last_name,
     isFirstLogin: response.data.isFirstLogin
   }));
 
@@ -170,7 +163,7 @@
     try {
       console.log('Processing invitation token:', inviteToken); // Debug log
       const inviteResponse = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/grp_expenses/invite/accept?token=${inviteToken}`,
+        `/api/grp_expenses/invite/accept?token=${inviteToken}`,
         {
           headers: {
             Authorization: `Bearer ${response.data.token}`
@@ -185,7 +178,7 @@
         
         // Refresh the user's groups list
         try {
-          const groupsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/grp_expenses/my-groups`, {
+          const groupsResponse = await axios.get('/api/grp_expenses/my-groups', {
             headers: {
               Authorization: `Bearer ${response.data.token}`
             }
@@ -293,7 +286,7 @@
         try {
             console.log('Sending OTP request for:', resetEmail.value);
           const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/users/forgot-password`,
+            'http://localhost:3000/api/users/forgot-password',
             { email: resetEmail.value }
           );
   
@@ -335,7 +328,7 @@ if (!/^\d{6}$/.test(otpString)) {
         try {
           console.log('Verifying OTP for:', resetEmail.value);
           const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/users/verify-otp`,
+            'http://localhost:3000/api/users/verify-otp',
             { 
               email: resetEmail.value,
               otp: otpString
@@ -398,7 +391,7 @@ if (!/^\d{6}$/.test(otpString)) {
         });
 
           const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/users/reset-password-otp`,
+            'http://localhost:3000/api/users/reset-password-otp',
             { 
               email: resetEmail.value,
               newPassword: newPassword.value,
@@ -438,7 +431,7 @@ if (!/^\d{6}$/.test(otpString)) {
   
         try {
           const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/users/login`,
+            'http://localhost:3000/api/users/login',
             {
               email: email.value,
               password: password.value,
@@ -740,7 +733,7 @@ if (!/^\d{6}$/.test(otpString)) {
  }
   
    .login-bg {
-       background-image: url("/circle1.png");
+       background-image: url("/circle.png");
        background-size: cover;
        background-position: center;
        background-repeat: no-repeat;
@@ -765,10 +758,9 @@ if (!/^\d{6}$/.test(otpString)) {
    .login-container {
     width: 100%;
     max-width: 650px;
-    min-width: 390px;
+    min-width: 320px;
     max-height: 600px;
-    background: rgba(255, 255, 255, 0.6); /* semi-transparent white */
-    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.92); /* Crisp white with slight transparency */
     border-radius: 20px;
     display: flex;
     justify-content: space-between;
@@ -776,9 +768,28 @@ if (!/^\d{6}$/.test(otpString)) {
     padding: 15px;
     gap: 20px;
     box-sizing: border-box;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); /* soft depth */
-    border: 1px solid rgba(255, 255, 255, 0.4); /* subtle white border */
+    
+    /* Soft 3D shadow effect (floating panel) */
+    box-shadow:
+        6px 6px 12px rgba(0, 0, 0, 0.08),    /* Bottom-right shadow */
+        6px 6px 12px rgba(0, 0, 0, 0.08),     /* Inner bottom-right shadow */
+        6px 6px 12px rgba(0, 0, 0, 0.08),  
+        6px 6px 12px rgba(0, 0, 0, 0.08),  ; 
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border for depth */
+    transition: all 0.3s ease;
+    position: relative;
 }
+
+/* Optional: Lift effect on hover */
+.login-container:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        8px 8px 16px rgba(0, 0, 0, 0.1),
+        -8px -8px 16px rgba(255, 255, 255, 0.712),
+        inset 1px 1px 2px rgba(255, 255, 255, 0.712),
+        inset -1px -1px 2px rgba(0, 0, 0, 0.07);
+}
+
    
    .login-form {
        width: 50%;
@@ -851,7 +862,9 @@ input.text-style:hover {
    }
    
    .login-btn {
-    width: 200px;
+    width: 100%;
+    max-width: 300px;
+    min-width: 170px;
     background: linear-gradient(135deg, #a8d0c2, #62a293, #a8d0c2);
     border-radius: 20px;
     border: none;
@@ -902,6 +915,7 @@ input.text-style:hover {
   .deco-image {
       width: 100%;
       max-width: 300px;
+      min-width: 100px;
       height: auto;
       margin-top: 100px;
       filter: drop-shadow(0 10px 20px rgba(50, 120, 70, 0.15));
@@ -1013,14 +1027,15 @@ input.text-style:hover {
        .login-form,
        .login-deco-container {
            width: 50%;
+           padding: 10px;
        }
    
        .deco-image {
-           max-width: 220px;
+           max-width: 120px;
        }
    
        .penny {
-           font-size: 28px;
+           font-size: 25px;
        }
    
        .login-label {
@@ -1032,4 +1047,6 @@ input.text-style:hover {
            padding: 6px 0;
        }
    }
+
+
    </style>

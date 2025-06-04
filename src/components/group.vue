@@ -1,3 +1,4 @@
+
 <template>
   <Navigation />
   <div class="group-header-decoration">
@@ -200,6 +201,7 @@
       :disabled="!canAddContributions"
     >
   </div>
+
   <div class="btn-save-wrapper">
     <button 
       @click="saveContribution" 
@@ -319,16 +321,18 @@
                     <th>Item Price</th>
                     <th>Date</th>
                     <th>Added By</th>
+                    <th>Note</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="expense in filteredExpenses" :key="expense.id">
-                    <td>{{ expense.expense_type || 'N/A' }}</td>
-                    <td>{{ expense.item_name || 'N/A' }}</td>
+                    <td>{{ (expense.expense_type || 'N/A') .toUpperCase() }}</td>
+                    <td>{{ (expense.item_name || 'N/A') .toUpperCase() }}</td>
                     <td>{{ formatPHP(expense.item_price) }}</td>
                     <td>{{ formatDate(expense.expense_date) }}</td>
                     <td>{{ expense.username }}</td>
+                    <td>{{ expense.note || 'no note' }}</td>
                     <td class="actions">
                       <div class="action-buttons">
                         <button 
@@ -605,6 +609,43 @@
       <!-- Settings Tab (Admin Only) -->
       <div v-if="activeTab === 'settings' && isAdmin" class="settings-tab">
         <div class="settings-section">
+    <h3 class="section-title"><i class="fas fa-user-clock"></i> Pending Join Requests</h3>
+    
+    <div v-if="pendingRequestsLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading pending requests...</p>
+    </div>
+    
+    <div v-else-if="pendingRequestsError" class="error-container">
+      <p class="error-message">{{ pendingRequestsError }}</p>
+      <button @click="fetchPendingRequests" class="retry-button">Retry</button>
+    </div>
+    
+    <div v-else-if="pendingRequests.length === 0" class="no-requests">
+      <p>No pending join requests</p>
+    </div>
+    
+    <div v-else class="requests-list">
+      <div v-for="request in pendingRequests" :key="request.id" class="request-item">
+        <div class="request-info">
+          <span class="request-user">{{ request.username }}</span>
+          <span class="request-email">{{ request.email }}</span>
+          <span class="request-date">Requested: {{ formatDate(request.requested_at) }}</span>
+        </div>
+        
+        <div class="request-actions">
+          <button @click="approveRequest(request)" class="approve-button">
+            <i class="fas fa-check"></i> Approve
+          </button>
+          <button @click="rejectRequest(request)" class="reject-button">
+            <i class="fas fa-times"></i> Reject
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+        
+        <div class="settings-section">
           <h3 class="section-title"><i class="fas fa-cog"></i> Group Settings</h3>
          
           <div class="setting-item">
@@ -800,13 +841,13 @@
               @change="handleCategoryChange"
             >
               <option value="">Select a category</option>
-              <option value="Food">Food</option>
-              <option value="Bill">Bill</option>
-              <option value="Transportation">Transportation</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="Healthcare">Healthcare</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Other">Other</option>
+              <option value="Food">FOOD</option>
+              <option value="Bill">BILL</option>
+              <option value="Transportation">TRANSPORTATION</option>
+              <option value="Entertainment">ENTERTAINMENT</option>
+              <option value="Healthcare">HEALTHCARE</option>
+              <option value="Shopping">SHOPPING</option>
+              <option value="Other">OTHER</option>
             </select>
             <button 
       @click="startVoiceInput('category')" 
@@ -845,6 +886,7 @@
           <div class="input-with-voice">
             <input 
               v-model="newExpense.item_name" 
+              @input="newExpense.item_name = $event.target.value.toUpperCase()"
               type="text" 
               required
               minlength="2"
@@ -881,6 +923,28 @@
     </button>
           </div>
         </div>
+
+        <div class="form-group">
+          <label>Note</label>
+          <div class="input-with-voice">
+            <input 
+              v-model="newExpense.note" 
+              placeholder="Enter a note (optional)"
+              type="text" 
+              minlength="2"
+              maxlength="255"
+            />
+            <button 
+              @click="startVoiceInput('note')" 
+              class="voice-btn" 
+              :class="{ active: isListening && voiceInputActiveField === 'note' }"
+              title="Set note by voice"
+            >
+              <i class="fas fa-microphone"></i>
+            </button>
+          </div>
+        </div>
+
         
         <div class="form-actions">
           <button type="button" @click="closeModal" class="cancel-button">Cancel</button>
@@ -929,7 +993,7 @@
         @keyup.enter="updateContribution"
       >
     </div>
-    
+
     <div class="modal-actions">
       <button @click="updateContribution" class="btn-save1" :disabled="!editingContribution.amount || editingContribution.amount <= 0">
         Save Changes
@@ -953,14 +1017,13 @@
             <div class="form-group">
               <label>Category</label>
               <select v-model="editingExpense.expense_type" required>
-                <option value="Food">Food</option>
-                <option value="Entertainment">Accomodation</option>
-                <option value="Transportation">Transportation</option>
-                <option value="Entertainment">Bills</option>
-                <option value="Entertainment">Shopping</option>
-                <option value="Entertainment">Entertainment</option>
-                <option value="Utilities">Essentials</option>
-                <option value="Other">Others</option>
+              <option value="Food">FOOD</option>
+              <option value="Bill">BILL</option>
+              <option value="Transportation">TRANSPORTATION</option>
+              <option value="Entertainment">ENTERTAINMENT</option>
+              <option value="Healthcare">HEALTHCARE</option>
+              <option value="Shopping">SHOPPING</option>
+              <option value="Other">OTHER</option>
               </select>
             </div>
             <div v-if="editingExpense.expense_type === 'Other'" class="form-group">
@@ -974,11 +1037,15 @@
         </div>
             <div class="form-group">
               <label>Item Name</label>
-              <input v-model="editingExpense.item_name" type="text" required>
+              <input v-model="editingExpense.item_name" @input="editingExpense.item_name = $event.target.value.toUpperCase()" type="text" required>
             </div>
             <div class="form-group">
               <label>Amount</label>
               <input v-model="editingExpense.item_price" type="number" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+              <label>Note</label>
+              <input v-model="editingExpense.note" type="text">
             </div>
             <div class="form-actions">
               <button type="button" @click="closeModal" class="cancel-button">Cancel</button>
@@ -990,14 +1057,27 @@
     </div>
     
     <!-- Confirmation Modal -->
-    <div v-if="showConfirmationModal" class="modal-overlay2">
+    <div v-if="showConfirmationModal" class="modal-overlay">
       <div class="modal-content confirmation-modal">
         <div class="modal-header2">
           <h3>{{ confirmationTitle }}</h3>
-          <button @click="closeModal" class="close-button2">&times;</button>
+          <button @click="closeModal" class="close-button">&times;</button>
         </div>
         <div class="modal-body2">
           <p>{{ confirmationMessage }}</p>
+
+          <!-- Conditional note input -->
+          <div v-if="confirmationNoteRequired" class="note-section">
+            <label for="noteInput">Reason:</label>
+            <textarea
+              id="noteInput"
+              v-model="confirmationNote"
+              placeholder="Enter your reason here (optional)"
+              rows="1"
+              class="note-textarea"
+            ></textarea>
+          </div>
+
           <div class="confirmation-actions">
             <button @click="closeModal" class="cancel-button">Cancel</button>
             <button @click="confirmAction" class="confirm-button">Confirm</button>
@@ -1026,10 +1106,15 @@ export default {
   },
   data() {
     return {
+      confirmationNote: '', 
+      confirmationNoteRequired: false,
+      pendingRequests: [],
+      pendingRequestsLoading: false,
+      pendingRequestsError: null,
       blockedMembers: [],
-    blockingMember: false,
-    unblockingMember: false,
-    showBlockedMembers: false,
+      blockingMember: false,
+      unblockingMember: false,
+      showBlockedMembers: false,
       editPhotoPreview: null,
       editPhotoFile: null,
       editingPhoto: null,  // Initialize as null
@@ -1043,6 +1128,7 @@ export default {
       memberContributions: [],
       contributions: [],
       paidAmountInput: 0,
+      contributionNoteInput: '',
       contributionHistory: [],
       paidAmountLoading: false,
       localGroupId: this.groupId,
@@ -1077,13 +1163,13 @@ export default {
       promoteSuccess: '',
       showEditContributionModal: false,
       photoPreview: null,
-    uploadingPhoto: false,
-    groupPhotos: [],
-    photosLoading: false,
-    photosError: null,
+      uploadingPhoto: false,
+      groupPhotos: [],
+      photosLoading: false,
+      photosError: null,
       showUploadModal: false,
-    viewingPhoto: null,
-    newPhoto: {
+      viewingPhoto: null,
+      newPhoto: {
       description: '',
       file: null
     },
@@ -1100,12 +1186,14 @@ export default {
         item_name: '',
         item_price: 0,
         expense_type: '',
+        note: '',
       },
       customExpenseType: '', 
       editingExpense: {
       expense_type: '',
       item_name: '',
-      item_price: null
+      item_price: null,
+      note: ''
     },
       
       editingExpense: {},
@@ -1262,6 +1350,11 @@ export default {
   },
 
   watch: {
+    isAdmin(newVal) {
+    if (newVal) {
+      this.fetchPendingRequests();
+    }
+  },
     localGroupId: {
     immediate: true,
     async handler(newGroupId, oldGroupId) {
@@ -1279,15 +1372,25 @@ export default {
   },
   'groupId': {
     immediate: true,
-    async handler(newGroupId) {
-      if (newGroupId && newGroupId !== this.localGroupId) {
+    async handler(newGroupId, oldGroupId) {
+      if (newGroupId && newGroupId !== oldGroupId) {
+        // Reset all local data
+        this.resetComponentState();
+        
+        // Update local group ID
         this.localGroupId = newGroupId;
-        this.groupPhotos = [];
+        
+        // Fetch all necessary data
         await Promise.all([
+          this.fetchGroupData(),
+          this.fetchPhotos(),
+          this.loadExpenses(),
+          this.fetchContributions(),
           this.fetchContributionHistory(),
-          this.initializeGroupData(),
-          this.fetchPhotos() 
+          this.fetchBudgetData()
         ]);
+        
+        // Set original name for comparison
         this.originalName = this.group.group_name || '';
       }
     }
@@ -1480,6 +1583,10 @@ export default {
     this.contributions = this.contributions || [];
     this.memberContributions = this.memberContributions || [];
     
+    if (this.isAdmin) {
+      await this.fetchPendingRequests();
+    }
+
    // await this.fetchAvailableBudgets();
   } catch (err) {
     console.error('Failed to load group data:', err);
@@ -1511,9 +1618,40 @@ export default {
     //  'fetchAvailableBudgets'
     ]),
 
-    editPhoto(photo) {
-  this.editingPhoto = { ...photo };
-},
+    resetComponentState() {
+    // Reset all component data that's specific to a group
+    //this.expenses = [];
+    this.$store.commit('group/RESET_EXPENSES');
+    this.contributions = [];
+    this.contributionHistory = [];
+    this.memberContributions = [];
+    this.groupPhotos = [];
+    this.blockedMembers = [];
+    this.pendingRequests = [];
+    this.pendingInvites = [];
+    this.showBlockedMembers = false;
+    
+    // Reset budget related data
+    this.remainingBudget = 0;
+    this.budgetProgress = 0;
+    
+    // Reset any modal states
+    this.showAddExpenseModal = false;
+    this.showEditExpenseModal = false;
+    this.showConfirmationModal = false;
+    
+    // Reset form data
+    this.resetNewExpense();
+  },
+  
+        setNoteFromVoice(noteText) {
+        this.newExpense.note = noteText;
+        this.$toast.success(`Note set to: ${noteText}`);
+      },
+
+      editPhoto(photo) {
+      this.editingPhoto = { ...photo };
+    },
 
 canEditPhoto(photo) {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -1643,6 +1781,10 @@ canEditPhoto(photo) {
         action: (match) => this.setAmountFromVoice(match[2])
       },
       {
+        pattern: /^(set|add|enter) note (.*)/i,
+        action: (match) => this.setNoteFromVoice(match[2])
+      },
+      {
         pattern: /^submit|save|add expense/i,
         action: () => this.handleSubmit()
       },
@@ -1708,10 +1850,13 @@ canEditPhoto(photo) {
         case 'amount':
           this.handleAmountInput(transcript);
           break;
-          case 'customType': 
-    this.handleCustomTypeInput(transcript);
-    break;
-      }
+        case 'customType': 
+          this.handleCustomTypeInput(transcript);
+          break;
+        case 'note':
+          this.handleNoteInput(transcript);
+          break;
+        }
       this.stopVoiceInput(); // Auto-stop after field input
       return;
     }
@@ -1743,6 +1888,11 @@ canEditPhoto(photo) {
     } else {
       this.$toast.error("Couldn't understand the amount. Please try again.");
     }
+  },
+
+    handleNoteInput(transcript) {
+    this.newExpense.note = transcript;
+    this.$toast.success(`Note set to: ${transcript}`);
   },
 
   handleGeneralCommands(transcript) {
@@ -1985,6 +2135,137 @@ handleEditFileSelect(event) {
   }
 },
 
+async fetchPendingRequests() {
+  this.pendingRequestsLoading = true;
+  this.pendingRequestsError = null;
+  
+  try {
+    const response = await this.$axios.get(
+      `/api/grp_expenses/${this.localGroupId}/requests`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jsontoken')}`
+        }
+      }
+    );
+    
+    if (response.data.success) {
+      // Transform data to match your template structure
+      this.pendingRequests = response.data.data.map(request => ({
+        id: request.id,
+        username: request.username,
+        email: request.email,
+        requested_at: request.requested_at
+      }));
+    }
+  } catch (err) {
+    this.pendingRequestsError = err.response?.data?.message || 'Failed to load pending requests';
+    console.error('Error fetching pending requests:', err);
+  } finally {
+    this.pendingRequestsLoading = false;
+  }
+},
+  
+  async approveRequest(request) {
+  try {
+    const response = await this.$axios.put(
+      `/api/grp_expenses/${this.localGroupId}/requests/${request.id}/approve`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jsontoken')}`
+        }
+      }
+    );
+    
+    if (response.data.success) {
+      this.$notify({
+        title: 'Success',
+        message: `${request.username} has been approved`,
+        type: 'success'
+      });
+      await this.fetchPendingRequests();
+      await this.fetchGroupData(); // Refresh members list
+    }
+  } catch (err) {
+    this.$notify({
+      title: 'Error',
+      message: err.response?.data?.message || 'Failed to approve request',
+      type: 'error'
+    });
+  }
+},
+  
+async rejectRequest(request) {
+  try {
+    const response = await this.$axios.put(
+      `/api/grp_expenses/${this.localGroupId}/requests/${request.id}/reject`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jsontoken')}`
+        }
+      }
+    );
+    
+    if (response.data.success) {
+      this.$notify({
+        title: 'Success',
+        message: `${request.username}'s request has been rejected`,
+        type: 'success'
+      });
+      await this.fetchPendingRequests();
+    }
+  } catch (err) {
+    this.$notify({
+      title: 'Error',
+      message: err.response?.data?.message || 'Failed to reject request',
+      type: 'error'
+    });
+  }
+},
+
+  async joinGroup() {
+  try {
+    const response = await this.$axios.post(
+      '/api/grp_expenses/join',
+      { groupCode: this.groupCodeInput },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jsontoken')}`
+        }
+      }
+    );
+    
+    if (response.data.success) {
+      if (response.data.message.includes('pending')) {
+        // Show pending approval message
+        this.$notify({
+          title: 'Request Submitted',
+          message: 'Your join request is pending admin approval',
+          type: 'info'
+        });
+      } else {
+        // Regular success message
+        this.$notify({
+          title: 'Success',
+          message: response.data.message,
+          type: 'success'
+        });
+      }
+      
+      // Refresh groups list
+      await this.fetchUserGroups();
+    }
+  } catch (err) {
+    this.$notify({
+      title: 'Error',
+      message: err.response?.data?.message || 'Failed to join group',
+      type: 'error'
+    });
+  }
+},
+
 async updatePhoto() {
   if (!this.editingPhoto) return;
   
@@ -2174,6 +2455,8 @@ async fetchPhotos() {
 
     this.confirmationTitle = 'Delete Photo';
     this.confirmationMessage = 'Are you sure you want to delete this photo?';
+    this.confirmationNoteRequired = false;
+    this.confirmationNote = '';
     this.confirmAction = async () => {
     try {
       await this.deletePhoto(photo.id);
@@ -2231,19 +2514,23 @@ async fetchPhotos() {
   confirmBlockMember(member) {
     this.confirmationTitle = 'Block Member';
     this.confirmationMessage = `Are you sure you want to block ${member.username}? They won't be able to rejoin unless unblocked.`;
+    this.confirmationNoteRequired = true;
+    this.confirmationNote = '';
     this.confirmAction = async () => {
       try {
         this.blockingMember = true;
         
         const response = await this.$axios.post(
-          `/api/grp_expenses/groups/${this.localGroupId}/members/${member.id}/block`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('jsontoken')}`
-            }
+        `/api/grp_expenses/groups/${this.localGroupId}/members/${member.id}/block`,
+        { 
+          reason: this.confirmationNote || null 
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('jsontoken')}`
           }
-        );
+        }
+      );
         
         if (response.data.success) {
           this.showSuccess(`${member.username} has been blocked`);
@@ -2271,6 +2558,8 @@ async fetchPhotos() {
   confirmUnblockMember(member) {
     this.confirmationTitle = 'Unblock Member';
     this.confirmationMessage = `Are you sure you want to unblock ${member.username}? They will be able to rejoin the group.`;
+    this.confirmationNoteRequired = false;
+    this.confirmationNote = '';
     this.confirmAction = async () => {
       try {
         this.unblockingMember = true;
@@ -2526,6 +2815,8 @@ async updateMemberContributions() {
     leaveGroup() {
   this.confirmationTitle = 'Leave Group';
   this.confirmationMessage = 'Are you sure you want to leave this group? You will need to be invited again to rejoin.';
+  this.confirmationNoteRequired = false;
+  this.confirmationNote = '';
   this.confirmAction = async () => {
     try {
       await this.$store.dispatch('group/leaveGroup', this.localGroupId);
@@ -2550,6 +2841,8 @@ async updateMemberContributions() {
     promoteToAdmin(member) {
   this.confirmationTitle = 'Promote to Admin';
   this.confirmationMessage = `Are you sure you want to promote ${member.username} to admin? They will have full control over this group.`;
+  this.confirmationNoteRequired = false;
+  this.confirmationNote = '';
   this.confirmAction = async () => {
     try {
       await this.$store.dispatch('group/promoteToAdmin', {
@@ -2649,7 +2942,7 @@ showError(message) {
     amount: parseFloat(plainContribution.amount),
     date: plainContribution.date,
     status: plainContribution.status,
-    originalAmount: parseFloat(plainContribution.amount)
+    originalAmount: parseFloat(plainContribution.amount),
   };
   this.showEditContributionModal = true;
 },
@@ -2663,7 +2956,7 @@ async updateContribution() {
   try {
     const response = await this.$axios.put(
       `/api/grp_expenses/groups/${this.localGroupId}/contributions/${this.editingContribution.id}`,
-      { amount: this.editingContribution.amount },
+      { amount: this.editingContribution.amount},
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('jsontoken')}`
@@ -2771,6 +3064,7 @@ async updateContribution() {
       if (response.data.success) {
         this.showSuccess('Contribution saved successfully!');
         this.paidAmountInput = 0;
+        this.contributionNoteInput = ''; 
 
         await Promise.all([
           this.fetchContributions(),
@@ -3037,38 +3331,61 @@ async updateBudget() {
     },
 
     async initializeGroupData() {
-  const user = JSON.parse(localStorage.getItem('user'));
-  const token = localStorage.getItem('jsontoken');
+      const user = JSON.parse(localStorage.getItem('user'));
+      const token = localStorage.getItem('jsontoken');
 
-  if (!user || !token) {
-    this.$router.push('/login');
-    return;
-  }
+      if (!user || !token) {
+        this.$router.push('/login');
+        return;
+      }
 
-  if (!this.localGroupId) {
-    this.$router.push('/GC');
-    return;
-  }
+      if (!this.localGroupId) {
+        this.$router.push('/GC');
+        return;
+      }
 
-  try {
-    await Promise.all([
-      this.fetchGroupData(),
-      this.loadExpenses(),
-      this.$store.dispatch('group/fetchGroupBudget', this.localGroupId)
-    ]);
-    
-    // Call calculateRemaining after all data is loaded
-    this.calculateRemaining();
-    
-    // Verify access after loading
-    if (!this.hasGroupAccess) {
-      this.$router.replace('/GC');
-    }
-  } catch (err) {
-    console.error('Failed to load group data:', err);
-    this.$router.replace('/GC');
-  }
-},
+      try {
+        // First verify membership and get role/status
+        const membershipResponse = await this.$axios.get(
+          `/api/grp_expenses/${this.localGroupId}/verify-membership`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        // Check for pending request
+        if (membershipResponse.data.hasPendingRequest) {
+          localStorage.setItem('pendingGroupId', this.localGroupId);
+          this.$router.push({
+            name: 'GC',
+            query: { fromGroup: 'true' }
+          });
+          return;
+        }
+
+        // Admin should always have access regardless of status
+        const isAdmin = membershipResponse.data.role === 'admin';
+        
+        // For non-admins, check if they're active members
+        if (!isAdmin && (!membershipResponse.data.isMember || membershipResponse.data.status !== 'active')) {
+          this.$notify({
+            title: 'Access Denied',
+            message: 'You do not have access to this group',
+            type: 'error'
+          });
+          this.$router.push('/GC');
+          return;
+        }
+
+        // Initialize group data here...
+        await this.fetchGroupData();
+      } catch (err) {
+        console.error('Failed to initialize group data:', err);
+        this.$router.push('/GC');
+      }
+    },
     
     async fetchGroupData() {
  const user = JSON.parse(localStorage.getItem('user'));
@@ -3181,6 +3498,7 @@ async updateBudget() {
       expense_type: this.newExpense.expense_type === 'Other' 
         ? this.customExpenseType 
         : this.newExpense.expense_type,
+      note: this.newExpense.note, 
       group_id: this.localGroupId,
       user_id: user.id   
     };
@@ -3240,6 +3558,7 @@ showError(message) {
           item_name: this.editingExpense.item_name,
           item_price: parseFloat(this.editingExpense.item_price),
           expense_type: this.editingExpense.expense_type,
+          note: this.editingExpense.note,
           group_id: this.localGroupId,
           user_id: user.id   
         };
@@ -3326,6 +3645,8 @@ showError(message) {
     confirmDeleteExpense(expense) {
       this.confirmationTitle = 'Delete Expense';
       this.confirmationMessage = `Are you sure you want to delete "${expense.item_name}" (${this.formatPHP(expense.item_price)})?`;
+      this.confirmationNoteRequired = false;
+      this.confirmationNote = '';
       this.confirmAction = async () => {
       try {
         await this.deleteExpense({
@@ -3417,21 +3738,24 @@ async sendInvite() {
 },
 
     
-    confirmRemoveMember(member) {
-      this.confirmationTitle = 'Remove Member';
-      this.confirmationMessage = `Are you sure you want to remove ${member.username} from the group?`;
-      this.confirmAction = async () => {
-        try {
-          console.log('Removing member with:', {
-        groupId: this.localGroupId,  // Verify this exists
-        memberId: member.id          // Verify this exists
-      });
-
-          await this.removeMember({ 
-        groupId: this.localGroupId, 
-        memberId: member.id 
-      });
-
+confirmRemoveMember(member) {
+  this.confirmationTitle = 'Remove Member';
+  this.confirmationMessage = `Are you sure you want to remove ${member.username} from the group?`;
+  this.confirmationNoteRequired = true;
+  this.confirmationNote = '';      
+  this.confirmAction = async () => {
+    try {
+      await this.$axios.post(
+        `/api/grp_expenses/${this.localGroupId}/members/${member.id}/remove`,
+        { 
+          reason: this.confirmationNote || null 
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('jsontoken')}`
+          }
+        }
+      );
           this.$notify({
             title: 'Success',
             message: 'Member removed successfully',
@@ -3439,6 +3763,7 @@ async sendInvite() {
           });
 
           this.closeModal();
+          await this.fetchGroupData();
         } catch (err) {
           console.error('Error removing member:', err);
           this.$notify({
@@ -3497,6 +3822,8 @@ async sendInvite() {
     confirmDeleteGroup() {
       this.confirmationTitle = 'Delete Group';
       this.confirmationMessage = 'Are you sure you want to delete this group permanently? This action cannot be undone.';
+      this.confirmationNoteRequired = false;
+      this.confirmationNote = '';
       this.confirmAction = async () => {
         try {
           await this.deleteGroup(this.localGroupId);
@@ -3581,8 +3908,6 @@ if (response.data.success) {
       next('/GC');
       return;
     }
-        
-        // Rest of your existing route guard logic
     });
 },
 
@@ -3616,6 +3941,82 @@ if (response.data.success) {
 </script>
 
 <style scoped>
+.requests-list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.request-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa; /* light gray */
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.request-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.request-user {
+  font-weight: 600;
+  color: #333;
+}
+
+.request-email {
+  font-size: 13px;
+  color: #555;
+}
+
+.request-date {
+  font-size: 12px;
+  color: #888;
+}
+
+.request-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.approve-button,
+.reject-button {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s ease;
+}
+
+/* Approve Button */
+.approve-button {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.approve-button:hover {
+  background-color: #c3e6cb;
+}
+
+/* Reject Button */
+.reject-button {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.reject-button:hover {
+  background-color: #f5c6cb;
+}
 .contributions-disabled-notice {
   background-color: #e3f3ee;
   padding: 10px;
@@ -3648,25 +4049,38 @@ if (response.data.success) {
 }
 
 .btn-blocked-members {
-  background: #f8f9fa;
-  border: 1px solid #ddd;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  background: #f6fafd;
+  border: 1px solid #6a9c89;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 15px;
+  font-weight: 500;
+  color: #22684d;
+  transition: 
+    background-color 0.3s ease, 
+    box-shadow 0.3s ease, 
+    transform 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .btn-blocked-members:hover {
-  background: #e9ecef;
+  background: #e0f1ef;
+  box-shadow: 0 4px 10px rgba(38, 102, 94, 0.1);
+  transform: translateY(-1px);
 }
+
 
 .blocked-members-list {
   margin-top: 1rem;
   border: 1px solid #eee;
   border-radius: 4px;
   overflow: hidden;
+  border: 2px dashed #ced4da;
+  border-radius: 8px;
 }
 
 .blocked-member-item {
@@ -3692,7 +4106,7 @@ if (response.data.success) {
 }
 
 .unblock-button {
-  background: #28a745;
+  background: #3e3f3f;
   color: white;
   border: none;
   padding: 5px 10px;
@@ -3701,7 +4115,7 @@ if (response.data.success) {
 }
 
 .unblock-button:hover {
-  background: #218838;
+  background: #737474;
 }
 
 .unblock-button:disabled {
@@ -3710,10 +4124,17 @@ if (response.data.success) {
 }
 
 .no-blocked-members {
-  padding: 1rem;
+  padding: 1.2rem;
+  margin: 1rem;
   text-align: center;
   color: #6c757d;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  font-size: 15px;
+  font-style: italic;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
+
 .modal-overlay10 {
   position: fixed;
   top: 0;
@@ -4717,7 +5138,7 @@ if (response.data.success) {
   list-style: none;
   padding: 0 10px;
   margin: 0;
-  max-height: 200px;
+  max-height: 250px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
@@ -4727,9 +5148,9 @@ if (response.data.success) {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   align-items: center;
-  padding: 10px 8px;
+  padding: 10px 5px;
   border-bottom: 1px solid #eaeaea;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   color: #2c3e50;
   transition: background-color 0.2s;
 }
@@ -4741,6 +5162,7 @@ if (response.data.success) {
 .contribution-date,
 .contribution-amount {
   text-align: left;
+  font-size: 0.97rem;
 }
 
 .status-badge {
@@ -4790,7 +5212,7 @@ if (response.data.success) {
 
 .contribution-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* slightly smaller min */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* slightly smaller min */
   gap: 15px;
   margin-bottom: 30px;
 }
@@ -4832,7 +5254,7 @@ if (response.data.success) {
   color: #27ae60;
 }
 .contribution-form {
-  max-width: 500px;
+  max-width: 600px;
   min-height: 250px;
   max-height: 600px;
   margin: 0 auto 40px;
@@ -5070,6 +5492,7 @@ if (response.data.success) {
 
 .member-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -5116,8 +5539,6 @@ if (response.data.success) {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  min-width: 300px;
-  width: 50%;
   min-height: 50px;
   font-size: 20px;
 }
@@ -5162,7 +5583,7 @@ if (response.data.success) {
 }
 
 .budget-total-container {
-  min-width: 28%;
+  min-width: 30%;
   box-sizing: border-box;
 }
 
@@ -5354,7 +5775,7 @@ h2 {
   border-radius: 10px;
   width: 100%;
   max-width: 400px;
-  min-width: 300px;
+  min-width: 200px;
 }
 
 .budget-form .form-group {
@@ -5412,11 +5833,11 @@ h2 {
 }
 
 .group-wrapper {
-  min-width: 68%;
+  min-width: 65%;
   width: 100%;
   box-sizing: border-box;
   margin: 0 auto;
-  max-width: 1200px;
+  max-width: 1000px;
 }
 
 .group-body {
@@ -5438,7 +5859,7 @@ h2 {
 }
 
 .total-amount-card {
-  background: #dbecea;
+  background: #d1e7e4;
   border-radius: 10px;
   height: 70px;
   padding: 14px 16px;
@@ -5508,7 +5929,6 @@ h2 {
     border-radius: 8px;
     animation: fadeSlideIn 0.6s ease-out;
     box-shadow: 0 2px 8px #00000059;
-    text-transform: uppercase;
     text-align: center;
     letter-spacing: 1px;
     margin-bottom: 0px;
@@ -5516,7 +5936,7 @@ h2 {
   }
 
 .expenses-table {
-  max-height: 400px;  
+  max-height: 500px;  
   overflow-y: auto;
   margin-bottom: 20px;
 }
@@ -5544,7 +5964,7 @@ h2 {
 }
 
 .expenses-table th {
-  background: linear-gradient(135deg, #6fcfa5, #3a9d8f);
+  background: linear-gradient(135deg, #6fcfa5, #3ea799);
   font-size: 0.8rem;
   padding: 12px 20px;
   color: white;
@@ -5557,9 +5977,9 @@ h2 {
   letter-spacing: 0.05em;
   box-shadow: 0 2px 4px rgba(74, 109, 92, 0.2);  /* subtle green tinted shadow */
 }
-Z
+
 .expenses-table tbody tr {
-  background-color: #ecfdf5;
+  background-color: #fbfbfb;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
   border-radius: 8px;
   transition: all 0.25s ease;
@@ -5567,7 +5987,7 @@ Z
 }
 
 .expenses-table tbody tr:hover {
-  background-color: #f1fbf7;
+  background-color: #ecfff7;
   transform: translateY(-3px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.12);
 }
@@ -6255,6 +6675,15 @@ Z
   box-shadow: 0 3px 8px rgba(211, 47, 47, 0.4);
 }
 
+.block-button {
+  background-color: #3e3f3f;
+  border-radius: 6px;
+  color: white;
+}
+
+.block-button:hover {
+  background: #737474;
+}
 
 .invite-section {
   margin-top: 30px;
@@ -6302,6 +6731,7 @@ Z
 
 .email-input {
   flex: 1;
+  min-width: 150px;
   padding: 10px 14px;
   border: 1px solid #b0c4b1;
   border-radius: 8px;
@@ -6660,6 +7090,12 @@ Z
   background-color: #ffebee;
 }
 
+.note-textarea {
+  width: 70%;
+  margin-bottom: -3px;
+  margin-left: 10px;
+}
+
 .form-group {
   margin-bottom: 15px;
 }
@@ -6736,9 +7172,6 @@ button.cancel-button{
 }
 
 
-
-
-
 .confirmation-modal {
   text-align: center;
 }
@@ -6794,7 +7227,7 @@ button.cancel-button{
   }
 }
 
-@media (max-width: 780px) {
+@media (max-width: 860px) {
   .group-con {
     flex-wrap: wrap;
     flex-direction: column;
@@ -6812,6 +7245,10 @@ button.cancel-button{
     display: flex;
     flex-wrap: wrap;
   }
+  .member-actions {
+    margin-top: 5px;
+  }
+
   .contribution-form {
       max-width: 700px;
       margin-bottom: 0;
@@ -6822,11 +7259,27 @@ button.cancel-button{
   .invite-form {
     flex-wrap: wrap;
   }
+  .floating-alert{
+      width: 70%;
+  }
   .danger-item {
     justify-content: center;
   }
   .danger-text {
     max-width: 100%;
+  }
+  .confirmation-modal {
+    width: 80%;
+  }
+  .request-item {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .request-actions{
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    gap: 5px;
   }
 }
 </style>

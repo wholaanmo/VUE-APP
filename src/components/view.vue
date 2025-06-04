@@ -852,8 +852,8 @@ updateExpenseView() {
 }
 
 .toggle-button {
-  background-color: #eefff9;
-  color: #2e5940;
+  background: linear-gradient(135deg, #e8ffec, #def4ee, #c4fff1);
+  color: #32615f;
   border: 2px solid #385248;
   padding: 10px 100px;
   border-radius: 8px;
@@ -865,9 +865,10 @@ updateExpenseView() {
 }
 
 .toggle-button:hover {
-  background-color: #4f7a6b;
+  background: linear-gradient(135deg, #67c29a, #359588);
+  text-shadow: 2px 1px 4px rgba(0, 0, 0, 0.2);
   color: white;
-  border: 2px solid #385248;
+  border-color: #32615f;
   transform: translateY(-1px);
 }
 
@@ -926,21 +927,22 @@ updateExpenseView() {
   margin: 3px;
   border-radius: 6px;
   background-color: #ffffff;
-  border: 2px solid #336333;
+  border: 2px solid #32615f;
   transition: all 0.3s ease;
   font-size: 15px;
   cursor: pointer;
 }
 
 .month-buttons button:hover {
-  background-color: #2a4935;
+  background-color: #32615f;
   color: white;
 }
 
 .month-buttons button.active {
-  background-color: #598272;
+  background: linear-gradient(135deg, #67c29a, #359588);
+  text-shadow: 2px 1px 4px rgba(0, 0, 0, 0.2);
   color: white;
-  border-color: #385248;
+  border-color: #32615f;
 }
 
 .text-danger {
@@ -973,15 +975,15 @@ updateExpenseView() {
 
 .summary-box {
   padding: 2px 16px 6px 16px; 
-  background-color: rgb(221, 255, 245);
-  border: 2px solid #336333;
+  background-color: #dbfff7;
+  border: none;
   border-radius: 20px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.293);
   font-size: 16px;
   margin: 2px 0 6px 0; 
   text-align: center;
   color: #000000;
-  min-width: 280px;
+  min-width: 250px;
   max-width: 100%;
 }
 
@@ -1045,7 +1047,7 @@ updateExpenseView() {
 font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 font-size: 20px;
 position: relative;
-margin-top: 120px;
+margin-top: 100px;
 display: flex;
 justify-content: center;
 margin-bottom: -10px;
@@ -1058,19 +1060,21 @@ button {
   padding: 12px 20px;
   position: relative;
   font-size: 20px;
-  border: 2px solid #386233;
+  border: 2px solid #32615f;
   background-color: #fffef5;
   cursor: pointer;
   transition: 0.3s ease;
 }
 
 button.active {
-  background-color: #2a4935;
+  background: linear-gradient(135deg, #67c29a, #359588);
+  text-shadow: 2px 1px 4px rgba(0, 0, 0, 0.2);
   color: white;
+  border-color: #32615f;
 }
 
 button:hover {
-  background-color: #2a4935;
+  background-color: #32615f;
   color: white;
 }
 
@@ -1091,19 +1095,17 @@ button:hover {
 }
 
 .con-container {
-  background: rgb(245, 255, 251);
-  border: 2px solid #336333;
+  background: #fafffe;
+  padding: 10px;
+  border: none;
   border-radius: 20px;
-  width: 70%; 
-  min-width: 380px;
-  max-width: 900px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 80%; 
+  min-width: 280px;
+  max-width: 700px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.293);
   align-items: flex-start;
   margin-bottom: 10px;
-  overflow-y: auto;
-  max-height: 105vh; 
-  scrollbar-width: thin; 
-  scrollbar-color: #2a4935 #ecfcec; 
+  max-height: 120vh;  
 }
 
 /* For Chrome/Edge/Safari */
@@ -1127,20 +1129,28 @@ button:hover {
   margin: 3px;
   border-radius: 1px;
   background-color: #ffffff;
-  border: 2px solid #336333;
+  border: 2px solid #32615f;
   transition: all 0.3s ease;
   font-size: 15px;
   border-radius: 6px;
 }
 
 .filter-buttons button.active {
-  background-color: #598272;
+  background: linear-gradient(135deg, #67c29a, #359588);
+  text-shadow: 2px 1px 4px rgba(0, 0, 0, 0.2);
   color: white;
-  border-color: #385248;
+  border-color: #32615f;
 }
 
 .filter-buttons button:hover {
-  background-color: #598272;
+  background-color: #32615f;
+}
+
+.expense-table {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin; 
+  scrollbar-color: #32615f #ecfcf9;
 }
 
 .expense-table table {
@@ -1153,6 +1163,8 @@ button:hover {
 }
 
 .expense-table th, .expense-table td {
+  font-size: 14px;
+  text-transform: uppercase; 
   padding: 12px;
   text-align: center;
   border: 1px solid #000000;
@@ -1161,7 +1173,8 @@ button:hover {
 }
 
 .expense-table th {
-  background-color: #6A9C89;
+  background: linear-gradient(135deg, #6fcfa5, #3ea799);
+  text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.277);
   color: white;
 }
 
@@ -1170,7 +1183,7 @@ button:hover {
 }
 
 .expense-table tr.alternate-row {
-  background-color: #eafffab5;
+  background-color: #eefffc;
 }
 
 .total-amount {
@@ -1178,15 +1191,20 @@ button:hover {
   font-weight: bold;
 }
 
+.chart-summary{
+  margin-left: 30px;
+}
+
 .chart{
   width: 380px;
   padding: 20px;
   box-sizing: border-box;
-  background: #f5fff5;
+  background: linear-gradient(to right, #f4fffa, #f0fff9, #e6fff6);
   border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.293);
   max-height: 700px;
-  border: 2px solid #336333;
-  margin-bottom: 10px;
+  border: none;
+  margin-bottom: 25px;
 }
 
 .download {
@@ -1213,7 +1231,7 @@ display: flex;
 flex-wrap: wrap;
 padding: 10px 20px;
 font-size: 16px;
-background-color: #598272;
+background: linear-gradient(135deg, #67c29a, #359588);
 color: white;
 border: none;
 cursor: pointer;
@@ -1226,4 +1244,37 @@ margin-left: 3px;
 background-color: #1e3731;
 }
 
+@media (max-width: 1135px) {
+.chart-summary {
+  margin-left: 0;
+}
+.chart{
+    width: 400px;
+  }
+  .expense-table th, .expense-table td {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-con{
+    text-align: center;
+  }
+  .con-container {
+    max-height: 140vh;
+    margin-bottom: 10px;
+  }
+  .chart-summary{
+    width: 85%;
+    margin-left: 0;
+  }
+  .chart{
+    width: 100%;
+  }
+  .expense-table th, .expense-table td {
+    font-size: 11px;
+    padding: 7px;
+  }
+}
 </style> 

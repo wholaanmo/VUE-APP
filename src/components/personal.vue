@@ -2475,7 +2475,7 @@ async deleteExpenseHandler(expense) {
   justify-content: center;
   align-items: center;
   border-bottom: 3px solid #4f7a6b;
-  background: linear-gradient(135deg, #b8f0db, #9fe3c9, #94dfd3);
+  background: linear-gradient(135deg, #8bbcae, #6a9c89);
   box-shadow: inset 0 -4px 6px rgba(0,0,0,0.1);
   color: #fff;
   font-weight: 700;
@@ -2484,12 +2484,11 @@ async deleteExpenseHandler(expense) {
 
 .modal-header5 h3 {
   position: absolute;
-  text-align: center;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
   font-size: 1.6rem;
-  text-shadow: 2px 1px 3px rgba(0, 0, 0, 0.427);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 .modal-header5 .close-button {
   position: absolute;
@@ -2511,7 +2510,7 @@ async deleteExpenseHandler(expense) {
 
 .modal-body5 {
   padding: 16px 20px;
-  background-color: #FBFFFC; 
+  background-color: #eefbf5; 
 }
 
 .form-group5 {
@@ -2546,8 +2545,6 @@ async deleteExpenseHandler(expense) {
 }
 .photos-tab {
   padding: 20px;
-  max-height: 500px;
-  overflow-y: auto;
 }
 
 .photos-header {
@@ -2585,7 +2582,7 @@ async deleteExpenseHandler(expense) {
 
 
 .upload-photo-btn {
-  background: linear-gradient(135deg, #9fccbd, #6eb3a3, #82b2a1);
+  background: linear-gradient(135deg, #a7d2c6, #8bbcae, #6a9c93);
   color: white;
   font-size: 15px;
   border: none;
@@ -2949,8 +2946,7 @@ async deleteExpenseHandler(expense) {
 }
 
 .submit-button1 {
-  background: linear-gradient(135deg, #9fccbd, #6eb3a3, #82b2a1);
-  text-shadow: 2px 1px 3px rgba(0, 0, 0, 0.352);
+  background: linear-gradient(135deg, #8bbcae, #6a9c89, #4f7a6b);
   color: white;
   box-shadow: 0 2px 5px rgba(106, 156, 137, 0.4);
 }
@@ -3827,8 +3823,8 @@ async deleteExpenseHandler(expense) {
   color: #2e4e40;
   padding: 20px;
   border-radius: 14px;
-  width: 90%;
-  max-width: 370px;
+  width: 92%;
+  max-width: 380px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   animation: fadeSlideUp 0.3s ease;
   font-family: "Segoe UI", sans-serif;
@@ -3892,7 +3888,7 @@ async deleteExpenseHandler(expense) {
 }
 
 .expense-success-message {
-  background-color: #d4ede8;
+  background-color: #d4edda;
   color: #155724;
   padding: 10px;
   border-radius: 4px;
@@ -3924,9 +3920,9 @@ async deleteExpenseHandler(expense) {
   align-content: center;
   flex: 1 1 60%;
   min-width: 280px;
-  background: #fafffe;
+  background: linear-gradient(to right, #fcfffe, #ecf9f6, #e7fdfa);
   border: none;
-  padding: 30px;
+  padding: 20px;
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.286);
   height: auto;
@@ -3946,6 +3942,12 @@ async deleteExpenseHandler(expense) {
   transition: all 0.3s ease;
 }
 
+.expenses-container:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
  .expense-form {
   text-align: center;
   width: 100%; 
@@ -3961,7 +3963,7 @@ async deleteExpenseHandler(expense) {
 .expenses-section h3 {
   text-align: center;
   align-content: center;
-  margin-top: 20px;
+  margin-top: 10px;
   color: #2e2e2e;
   font-size: 1.5rem; 
   padding-bottom: 10px;
@@ -4102,15 +4104,14 @@ td, th {
 }
 
 .form-title {
-  background: linear-gradient(135deg, #b8f0db, #9fe3c9, #94dfd3);
-  color: white;
+  background: linear-gradient(to right, #c2f3e5, #9ae2c7);
+  color: #26665e;
   padding: 14px 20px;
   border-radius: 10px;
   text-align: center;
   margin-bottom: 20px;
   font-size: 1.5rem;
   font-weight: 700;
-  text-shadow: 2px 1px 2px rgba(0, 0, 0, 0.427);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   letter-spacing: 0.5px;
 }
@@ -4135,15 +4136,14 @@ td, th {
 .form-group h3 {
   font-size: 1.35rem;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   margin-top: 0;
   color: #183d2a;
-  border-radius: 20px; 
-  background: linear-gradient(135deg, #effdf8, #def4ee, #e5faf3);
-  padding: 20px 16px;
+  background:none;
+  padding: 16px 16px;
+  border-bottom: 2px solid #183d2a;
   position: relative;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 2px 6px rgba(64, 64, 64, 0.301);
   letter-spacing: 0.5px;
 }
 
@@ -4271,12 +4271,6 @@ select[disabled] {
   .expense-photo-tabs {
     justify-content: space-between;
     gap: 10px;
-  }
-     .photos-tab {
-    max-height: 500px;
-  }
-  .budget-form {
-    width: 80%;
   }
 }
 

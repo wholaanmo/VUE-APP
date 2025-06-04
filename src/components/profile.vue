@@ -11,6 +11,7 @@
         </button>
       </div>
       <div class="info">
+        <p><strong>Name: {{ fullName }}</strong></p>
         <p><strong>Username: {{ userName }}</strong></p>
         <p><strong>Email: {{ userEmail }}</strong></p>
       </div>
@@ -186,6 +187,7 @@ export default {
       filterMonth: '', 
       wasBudgetExceeded: false,
       showLogoutModal: false,
+      fullName: "",
       userEmail: "",
       userName: "",
       selectedYear: new Date().getFullYear().toString(),
@@ -580,7 +582,7 @@ updateExpenseView() {
         console.log('Token being sent:', token);
 
         const response = await this.$axios.delete(
-          `${import.meta.env.VITE_API_URL}/api/users`,
+    'http://localhost:3000/api/users',
     {
         headers: { 
             Authorization: `Bearer ${token}` 
@@ -637,7 +639,7 @@ updateExpenseView() {
       try {
         const token = localStorage.getItem('jsontoken');
         const groupListResponse = await this.$axios.get(
-          `${import.meta.env.VITE_API_URL}/api/grp_expenses/my-groups`,
+          'http://localhost:3000/api/grp_expenses/my-groups',
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -732,7 +734,7 @@ updateExpenseView() {
     performLogout() {
     const token = localStorage.getItem('jsontoken');
     
-    this.$axios.post(`${import.meta.env.VITE_API_URL}/api/users/logout`, {}, {
+    this.$axios.post('http://localhost:3000/api/users/logout', {}, {
         headers: { Authorization: `Bearer ${token}` }
     })
     .then(() => {
@@ -759,7 +761,13 @@ updateExpenseView() {
     if (userData) {
         this.userEmail = userData.email;
         this.userName = userData.username;
+        if (userData.first_name && userData.last_name) {
+      this.fullName = `${userData.first_name} ${userData.last_name}`;
+    } else {
+      // Fallback to username if names aren't available
+      this.fullName = userData.username;
     }
+  }
     await this.loadAllGroupsData();
     
     // Only show welcome message if not already shown this session
@@ -1185,7 +1193,7 @@ updateExpenseView() {
 .personal-summary {
   flex: 2;
   min-height: 450px;
-  max-height: 550px;
+  max-height: 580px;
   background: #ffffff;
   padding: 30px 30px 15px 30px; /* top right bottom left */
   border-radius: 12px;
@@ -1379,7 +1387,7 @@ updateExpenseView() {
 }
 
 .modal-card.logout-modal {
-  background: linear-gradient(135deg, #a6e7d9, #589486);
+  background: linear-gradient(135deg, #a4e3c7, hsl(172, 31%, 53%));
   padding: 0.8rem 2rem 2rem 2rem; /* top right bottom left */
   border-radius: 1.25rem;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
@@ -1395,6 +1403,7 @@ updateExpenseView() {
   font-size: 1.6rem;
   margin-bottom: 0.75rem;
   font-weight: 700;
+  text-shadow: 2px 3px 6px #33333375;
   display: flex;
   justify-content: center;
   align-items: center;

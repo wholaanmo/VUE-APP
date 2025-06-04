@@ -21,6 +21,9 @@ export default {
     namespaced: true,
     state: getDefaultState(),
     mutations: {
+      RESET_EXPENSES(state) {
+        state.expenses = [];
+      },
       SET_CURRENT_GROUP_ID(state, groupId) {
         state.currentGroupId = groupId;
       },
@@ -369,31 +372,27 @@ async sendInvite({ commit }, { groupId, email }) {
   }
 },
       
-      async removeMember({ commit }, { groupId, memberId }) {
+      async removeMember({ commit }, { groupId, memberId, reason }) {
         try {
-          console.log('Vuex action receiving:', { groupId, memberId });
-
-          if (!groupId || !memberId) {
-            throw new Error('Missing groupId or memberId');
-          }
-          
           const response = await axios.delete(
-            `/api/grp_expenses/${groupId}/members/${memberId}`,
+            `/api/grp_expenses/groups/${groupId}/members/${memberId}`,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem('jsontoken')}`
-              }
+              },
+              data: { reason }
             }
           );
 
-          commit('REMOVE_MEMBER', memberId);
-          return response.data;
-        } catch (err) {
-          console.error('Error removing member:', {
-          error: err,
-          response: err.response?.data
-        });
-          throw err;
+          if (response.data.success) {
+            commit('REMOVE_MEMBER', memberId);
+            return response.data;
+          } else {
+            throw new Error(response.data.message || 'Failed to remove member');
+          }
+        } catch (error) {
+          console.error('Error removing member:', error);
+          throw error;
         }
       },
       
