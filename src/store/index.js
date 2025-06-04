@@ -7,7 +7,7 @@ export default createStore({
     group: groupModule 
   },
   state: {
-    viewExpenses: [], // Expenses for view page
+    viewExpenses: [], 
     addExpenses: [], 
     expenses: [],
     personalBudgets: [],

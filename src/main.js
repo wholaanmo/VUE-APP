@@ -6,7 +6,6 @@ import axios from 'axios';
 import Notifications from '@kyvg/vue3-notification'
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-console.log('Configured base URL:', axios.defaults.baseURL);
 
 const app = createApp(App)
 
@@ -19,4 +18,3 @@ app.use(Notifications)
 router.isReady().then(() => {
   app.mount('#app')
   })
-
